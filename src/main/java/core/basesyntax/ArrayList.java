@@ -1,12 +1,13 @@
 package core.basesyntax;
 
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 public class ArrayList<T> implements List<T> {
 
     private static final int DEFAULT_CAPACITY = 10;
-    private int size = 0;
+    private static final int GROWTH_NUMERATOR = 3;
+    private static final int GROWTH_DENOMINATOR = 2;
+    private int size;
     private T[] items;
 
     public ArrayList() {
@@ -16,7 +17,7 @@ public class ArrayList<T> implements List<T> {
     @Override
     public void add(T value) {
         if (size == items.length) {
-            items = growArray(items, 3 * items.length / 2);
+            items = growArray(items, GROWTH_NUMERATOR * items.length / GROWTH_DENOMINATOR);
         }
         items[size] = value;
         size++;
@@ -24,13 +25,12 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public void add(T value, int index) {
-
         if (index < 0 || index > size) {
             throw new ArrayListIndexOutOfBoundsException("Index: " + index + " is out of bounds");
         }
 
         if (size == items.length) {
-            items = growArray(items, 3 * items.length / 2);
+            items = growArray(items, GROWTH_NUMERATOR * items.length / GROWTH_DENOMINATOR);
         }
 
         System.arraycopy(items, index, items, index + 1, size - index);
@@ -43,7 +43,7 @@ public class ArrayList<T> implements List<T> {
         if (size + list.size() > items.length) {
             int newLenght = items.length;
             while (newLenght < size + list.size()) {
-                newLenght = 3 * newLenght / 2;
+                newLenght = GROWTH_NUMERATOR * newLenght / GROWTH_DENOMINATOR;
             }
 
             items = growArray(items, newLenght);
@@ -58,7 +58,8 @@ public class ArrayList<T> implements List<T> {
     @Override
     public T get(int index) {
         if (index < 0 || index >= size) {
-            throw new ArrayListIndexOutOfBoundsException("Index: " + index + " is out of bounds");
+            throw new ArrayListIndexOutOfBoundsException("Index "
+                    + index + " out of bounds for size " + size);
         }
         return items[index];
     }
@@ -66,7 +67,8 @@ public class ArrayList<T> implements List<T> {
     @Override
     public void set(T value, int index) {
         if (index < 0 || index >= size) {
-            throw new ArrayListIndexOutOfBoundsException("Index: " + index + " is out of bounds");
+            throw new ArrayListIndexOutOfBoundsException("Index "
+                    + index + " out of bounds for size " + size);
         }
         items[index] = value;
     }
@@ -74,22 +76,23 @@ public class ArrayList<T> implements List<T> {
     @Override
     public T remove(int index) {
         if (index < 0 || index >= size) {
-            throw new ArrayListIndexOutOfBoundsException("Index: " + index + " is out of bounds");
+            throw new ArrayListIndexOutOfBoundsException("Index "
+                    + index + " out of bounds for size " + size);
         }
         T result = items[index];
         System.arraycopy(items, index + 1, items, index, size - index - 1);
-        size--;
+        items[--size] = null;
         return result;
     }
 
     @Override
     public T remove(T element) {
         for (int i = 0; i < size; i++) {
-            if (Objects.equals(element, items[i])) {
+            if (element != null ? element.equals(items[i]) : items[i] == null) {
                 return remove(i);
             }
         }
-        throw new NoSuchElementException("No such element");
+        throw new NoSuchElementException("Element " + element + " not found");
     }
 
     @Override
