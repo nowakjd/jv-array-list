@@ -104,7 +104,7 @@ public class ArrayList<T> implements List<T> {
 
     private T[] growArray(T[] array, int newSize) {
         T[] newItems = (T[]) new Object[newSize];
-        System.arraycopy(items, 0, newItems, 0, items.length);
+        System.arraycopy(array, 0, newItems, 0, array.length);
         return newItems;
     }
 }
